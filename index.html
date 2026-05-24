@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 EP Birthday Reveal</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Prompt:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #FFD700;
+  --deep: #0d001f;
+  --purple: #7B2FBE;
+  --pink: #FF6B9D;
+  --cyan: #00E5FF;
+  --green: #00FF88;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--deep);
+  font-family: 'Mitr', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(123,47,190,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(0,45,100,0.4) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(255,107,157,0.1) 0%, transparent 50%);
+  z-index: 0; pointer-events: none;
+}
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+  text-align: center;
+}
+
+/* ── MUTE BUTTON ── */
+.mute-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'Mitr', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mute-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* ── HEADER ── */
+h1 {
+  font-family: 'Prompt', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 7vw, 3.8rem);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--pink) 50%, var(--cyan) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.15;
+  filter: drop-shadow(0 0 30px rgba(255,215,0,0.25));
+}
+.subtitle {
+  color: rgba(255,255,255,0.45);
+  font-size: .9rem;
+  margin-top: 6px;
+  letter-spacing: .5px;
+}
+
+/* ── DATE CHIP & PICKER ── */
+.date-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 40px;
+  padding: 8px 20px;
+  font-size: .85rem;
+  color: rgba(255,255,255,0.6);
+  margin: 18px auto 36px;
+}
+.custom-date-picker {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--cyan);
+  font-family: 'Prompt', sans-serif;
+  font-size: 0.85rem;
+  border-radius: 20px;
+  padding: 3px 12px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.custom-date-picker:focus {
+  border-color: var(--pink);
+  background: rgba(255, 255, 255, 0.15);
+}
+.custom-date-picker::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* ── MYSTERY BOX ── */
+.mystery-zone {
+  margin-bottom: 36px;
+}
+.mystery-label {
+  font-size: .8rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* The big question mark card */
+.big-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 28px;
+  height: 220px;
+  border-radius: 28px;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: border-color .4s, box-shadow .4s, transform 0.3s ease;
+}
+.big-card.idle {
+  border-color: rgba(255,255,255,0.1);
+}
+.big-card.spinning {
+  border-color: var(--pink);
+  box-shadow: 0 0 40px rgba(255,107,157,0.2);
+  transform: scale(0.98);
+}
+.big-card.revealed {
+  border-color: var(--gold);
+  box-shadow: 0 0 60px rgba(255,215,0,0.25), 0 0 120px rgba(255,215,0,0.08);
+  animation: cardPulse 2s ease infinite alternate;
+}
+.big-card.no-more {
+  border-color: var(--cyan);
+  box-shadow: 0 0 40px rgba(0,229,255,0.15);
+}
+@keyframes cardPulse {
+  from { box-shadow: 0 0 40px rgba(255,215,0,0.2); transform: scale(1); }
+  to   { box-shadow: 0 0 80px rgba(255,215,0,0.45); transform: scale(1.02); }
+}
+
+/* Shimmer overlay during spin */
+.big-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.big-card.spinning::after {
+  opacity: 1;
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.qmark {
+  font-size: 5rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 20px rgba(255,107,157,0.5));
+  animation: floatQ 3s ease-in-out infinite;
+}
+@keyframes floatQ {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.qmark-sub {
+  color: rgba(255,255,255,0.3);
+  font-size: .85rem;
+  margin-top: 10px;
+}
+
+/* Spin display text */
+.spin-text {
+  font-family: 'Prompt', sans-serif;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* Revealed person */
+.reveal-emoji {
+  font-size: 3rem;
+  animation: popIn .4s cubic-bezier(.175,.885,.32,1.275);
+  margin-bottom: 10px;
+}
+.reveal-name {
+  font-family: 'Prompt', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  color: var(--gold);
+  animation: slideUp .35s ease;
+  padding: 0 16px;
+}
+.reveal-meta {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+  animation: slideUp .45s ease;
+}
+@keyframes popIn {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* No more state */
+.no-more-text {
+  font-family: 'Prompt', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cyan);
+  animation: slideUp .4s ease;
+}
+.no-more-sub {
+  color: rgba(255,255,255,0.4);
+  font-size: .85rem;
+  margin-top: 8px;
+  animation: slideUp .5s ease;
+  padding: 0 20px;
+}
+
+/* Badges */
+.badge {
+  font-size: .72rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.badge.teacher { background: rgba(0,229,255,0.15); color: var(--cyan); border: 1px solid rgba(0,229,255,0.25); }
+.badge.student { background: rgba(255,215,0,0.12); color: var(--gold); border: 1px solid rgba(255,215,0,0.25); }
+.badge.room { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); }
+
+/* ── BUTTON ── */
+.btn-spin {
+  background: linear-gradient(135deg, #FF6B9D, #a83468, #7B2FBE);
+  border: none;
+  color: #fff;
+  font-family: 'Prompt', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  padding: 16px 52px;
+  border-radius: 60px;
+  cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: transform .25s, box-shadow .25s;
+  box-shadow: 0 8px 36px rgba(255,107,157,0.4);
+  letter-spacing: .5px;
+}
+.btn-spin::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 60%);
+  border-radius: inherit;
+}
+.btn-spin:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 14px 50px rgba(255,107,157,0.55); }
+.btn-spin:active { transform: scale(.97); }
+.btn-spin:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-reset {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.55);
+  font-family: 'Mitr', sans-serif;
+  font-size: .85rem;
+  padding: 10px 28px;
+  border-radius: 40px;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: all .2s;
+  display: none;
+}
+.btn-reset:hover { border-color: rgba(255,255,255,0.35); color: #fff; }
+.btn-reset.show { display: inline-block; }
+
+/* ── REVEALED LIST ── */
+.revealed-section {
+  margin-top: 40px;
+  text-align: left;
+}
+.section-title {
+  font-size: .78rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.revealed-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.revealed-item {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 14px;
+  animation: slideIn .4s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.item-num {
+  font-family: 'Prompt', sans-serif;
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: rgba(255,215,0,0.25);
+  min-width: 32px;
+  text-align: center;
+}
+.item-info { flex: 1; min-width: 0; }
+.item-name {
+  font-weight: 600;
+  font-size: .92rem;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.item-meta { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+
+/* ── SUMMARY ── */
+.summary-box {
+  margin-top: 36px;
+  background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,107,157,0.05));
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 24px;
+  padding: 28px;
+  animation: fadeIn .6s ease;
+  display: none;
+}
+.summary-box.show { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.summary-num {
+  font-family: 'Prompt', sans-serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 10vw, 5rem);
+  color: var(--gold);
+  line-height: 1;
+  filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
+}
+.summary-label {
+  color: rgba(255,255,255,0.6);
+  font-size: .95rem;
+  margin-top: 4px;
+}
+.summary-note {
+  color: rgba(255,255,255,0.35);
+  font-size: .78rem;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+/* ── CONFETTI ── */
+.confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 999; overflow: hidden; }
+.cp {
+  position: absolute;
+  opacity: 0;
+  animation: fall linear forwards;
+}
+@keyframes fall {
+  0%   { transform: translateY(-30px) translateX(0) rotate(0deg); opacity: 1; }
+  50%  { transform: translateY(50vh) translateX(20px) rotate(180deg); opacity: 0.9; }
+  100% { transform: translateY(110vh) translateX(-20px) rotate(360deg); opacity: 0; }
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar-wrap {
+  width: 100%; max-width: 440px; margin: 0 auto 6px;
+  height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.progress-bar-wrap.show { opacity: 1; }
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pink), var(--gold));
+  border-radius: 4px;
+  transition: width .5s ease;
+  width: 0%;
+}
+.progress-label {
+  font-size: .72rem;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 20px;
+  min-height: 16px;
+}
+</style>
+</head>
+<body>
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<!-- Mute Button -->
+<button id="muteBtn" class="mute-btn" onclick="toggleMute()">🔊 เสียง: เปิด</button>
+
+<div class="wrap">
+  <div class="header" style="margin-bottom:0">
+    <h1>🎂 วันนี้<br>ใครเกิด?</h1>
+    <p class="subtitle">EP Montfort · ลุ้นเปิดเผยทีละคน</p>
+  </div>
+
+  <!-- Date chip containing standard custom styled calendar picker -->
+  <div class="date-chip" id="dateChip">
+    📅 วันที่ลุ้น: 
+    <input type="date" id="dateInput" onchange="onDateChange(event)" class="custom-date-picker">
+  </div>
+
+  <!-- Mystery big card -->
+  <div class="mystery-zone">
+    <p class="mystery-label" id="mystLabel">กดเพื่อเปิดเผยคนแรก</p>
+
+    <!-- progress -->
+    <div class="progress-bar-wrap" id="progWrap">
+      <div class="progress-bar-fill" id="progFill"></div>
+    </div>
+    <p class="progress-label" id="progLabel"></p>
+
+    <div class="big-card idle" id="bigCard">
+      <!-- Content injected by JS -->
+      <div id="cardInner">
+        <div class="qmark">🎁</div>
+        <div class="qmark-sub">กดปุ่มด้านล่างเพื่อลุ้น</div>
+      </div>
+    </div>
+
+    <button class="btn-spin" id="spinBtn" onclick="reveal()">🎰 เปิดเผยคนแรก!</button>
+    <br>
+    <button class="btn-reset" id="resetBtn" onclick="resetAll()">↺ เริ่มใหม่</button>
+  </div>
+
+  <!-- Revealed so far -->
+  <div class="revealed-section" id="revealedSection" style="display:none">
+    <p class="section-title" id="revealedTitle">เปิดเผยแล้ว</p>
+    <div class="revealed-list" id="revealedList"></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-box" id="summaryBox">
+    <div class="summary-num" id="summaryNum">0</div>
+    <div class="summary-label">คนมีวันเกิดวันนี้ 🎉</div>
+    <div class="summary-note" id="summaryNote"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const ALL_DATA = [{"name":"Mr. Tanachai Tesapad","month":2,"day":29,"role":"Teacher","room":"หัวหน้าระดับชั้น"},{"name":"Ms. Warunee Na Lampang","month":6,"day":20,"role":"Teacher","room":"G.7A"},{"name":"Ms. Pamela Ramos","month":2,"day":14,"role":"Teacher","room":"G.7A"},{"name":"Mrs. GIGI GRECIA NARRIDO","month":9,"day":19,"role":"Teacher","room":"G.7A"},{"name":"Ms. Jariyaporn Khankham","month":5,"day":24,"role":"Teacher","room":"G.7B"},{"name":"Mr. Raffy Coling Dalwampo","month":10,"day":24,"role":"Teacher","room":"G.7B"},{"name":"Mr. Ausanee Noknoi","month":6,"day":6,"role":"Teacher","room":"G.7C"},{"name":"Ms. Lin","month":1,"day":6,"role":"Teacher","room":"G.7C"},{"name":"Ms. Ploy Kitinant","month":4,"day":1,"role":"Teacher","room":"G.7D"},{"name":"Ms. Lourdes David","month":7,"day":11,"role":"Teacher","room":"G.7D"},{"name":"Mr. Stephen Celestial","month":2,"day":13,"role":"Teacher","room":"G.7D"},{"name":"Mr. Puripat Ngamta","month":4,"day":13,"role":"Teacher","room":"G.8A"},{"name":"Mr. Muhammad Talha Farooq","month":1,"day":8,"role":"Teacher","room":"G.8A"},{"name":"Ms. Alexis Saylor","month":1,"day":30,"role":"Teacher","room":"G.8A"},{"name":"Mr. Sakchai Damrak","month":10,"day":7,"role":"Teacher","room":"G.8B"},{"name":"Mr. Zinedine Targada","month":7,"day":14,"role":"Teacher","room":"G.8B"},{"name":"Ms. Nattakan Phommuang","month":8,"day":20,"role":"Teacher","room":"G.8B"},{"name":"Mrs. Panuttarin Vinther","month":1,"day":1,"role":"Teacher","room":"G.8C"},{"name":"Mr. Danilo P. Tindungan","month":7,"day":14,"role":"Teacher","room":"G.8C"},{"name":"Mr. Bryan Matthew Martinez","month":6,"day":12,"role":"Teacher","room":"G.8C"},{"name":"Ms. Pohnpimon Peenung","month":11,"day":16,"role":"Teacher","room":"G.9A"},{"name":"Ms. Hidayatul Masruroh","month":8,"day":23,"role":"Teacher","room":"G.9A"},{"name":"Ms. Hannah Lute","month":1,"day":3,"role":"Teacher","room":"G.9A"},{"name":"Ms. Sirinan Chanpen","month":5,"day":23,"role":"Teacher","room":"G.9B"},{"name":"Mr. Seth John Agruda","month":5,"day":31,"role":"Teacher","room":"G.9B"},{"name":"Ms. Kidakan Siri","month":8,"day":21,"role":"Teacher","room":"G.10A"},{"name":"Mr. Muhammad Omar Khan","month":4,"day":2,"role":"Teacher","room":"G.10A"},{"name":"Mr. Abubakar Sunusi Ishak","month":7,"day":13,"role":"Teacher","room":"G.10A"},{"name":"Mr. Kiadtisak Tammati","month":6,"day":17,"role":"Teacher","room":"G.10B"},{"name":"Mrs. Angelica Lacerna Watiwat","month":1,"day":14,"role":"Teacher","room":"G.10B"},{"name":"Mrs. Weerisa Tantrapol","month":5,"day":1,"role":"Teacher","room":"G.10C"},{"name":"Ms. Zhou Ting","month":10,"day":27,"role":"Teacher","room":"G.10C"},{"name":"Ms. Zaynab Motala","month":9,"day":9,"role":"Teacher","room":"G.10C"},{"name":"Ms. Nutcha Kaewsurin","month":8,"day":24,"role":"Teacher","room":"G.11A"},{"name":"Mr. Jayanta Biswas","month":4,"day":20,"role":"Teacher","room":"G.11A"},{"name":"Mr. Stephen Robert Thompson","month":8,"day":13,"role":"Teacher","room":"G.11A"},{"name":"Mr. Songklod Supho","month":12,"day":12,"role":"Teacher","room":"G.11B"},{"name":"Mr. Saifu Islam Khan","month":9,"day":1,"role":"Teacher","room":"G.11B"},{"name":"Ms. Maturada Ngamta Ngamta","month":8,"day":11,"role":"Teacher","room":"G.11C"},{"name":"Mr. Robert William Schulte","month":7,"day":12,"role":"Teacher","room":"G.11C"},{"name":"Mrs. Pimlapat Janta","month":4,"day":26,"role":"Teacher","room":"G.12A"},{"name":"Mr. Pee Jay O. Embay","month":12,"day":15,"role":"Teacher","room":"G.12A"},{"name":"Mr. Jatenipit Wichaakkharawit","month":5,"day":6,"role":"Teacher","room":"G.12B"},{"name":"Mrs. Marisol Estolano Fumar","month":5,"day":27,"role":"Teacher","room":"G.12B"},{"name":"Ms. Chanthiraporn Champakham","month":6,"day":6,"role":"Teacher","room":"EP Secretary"},{"name":"Mr. Dr. Warinthrone Vasuwat","month":7,"day":21,"role":"Teacher","room":"Head of EP"},{"name":"Bro. Sarawut Yuchompoo, Ph.D.","month":10,"day":22,"role":"Teacher","room":"Vice Director / EP advisor"},{"name":"เวหา เอื้อพันธ์วิริยะกุล","month":2,"day":22,"role":"Student","room":"Grade 7A"},{"name":"กันตภณ สุขอร่าม","month":2,"day":27,"role":"Student","room":"Grade 7A"},{"name":"อัครบดินทร์ วัชรวัฒนไพศาล","month":6,"day":26,"role":"Student","room":"Grade 7A"},{"name":"ประเสริฐ์ ซวี่","month":6,"day":5,"role":"Student","room":"Grade 7A"},{"name":"ณภัทร คีรีประพาส","month":6,"day":18,"role":"Student","room":"Grade 7A"},{"name":"เฉิน ผิ่ง ชวุ่ย","month":2,"day":22,"role":"Student","room":"Grade 7A"},{"name":"นฤมิตร สิทธิวงค์","month":3,"day":14,"role":"Student","room":"Grade 7A"},{"name":"อิสระ สุเนต์ตา","month":10,"day":17,"role":"Student","room":"Grade 7A"},{"name":"นธาพัทธ์ ยอดยา","month":8,"day":25,"role":"Student","room":"Grade 7A"},{"name":"Ruofan Zhao","month":6,"day":9,"role":"Student","room":"Grade 7A"},{"name":"潇然 赖","month":7,"day":31,"role":"Student","room":"Grade 7A"},{"name":"จิรัชยา ธุมา","month":1,"day":17,"role":"Student","room":"Grade 7A"},{"name":"เรมีซ่า คาน","month":11,"day":19,"role":"Student","room":"Grade 7A"},{"name":"YIHAN WANG","month":7,"day":18,"role":"Student","room":"Grade 7A"},{"name":"ชนาธิป วิงวอน","month":5,"day":2,"role":"Student","room":"Grade 7A"},{"name":"EnYan Liu","month":11,"day":2,"role":"Student","room":"Grade 7A"},{"name":"xi shi","month":7,"day":1,"role":"Student","room":"Grade 7A"},{"name":"Moyi Xu","month":4,"day":13,"role":"Student","room":"Grade 7A"},{"name":"ปภังกร ทรงละออ","month":6,"day":17,"role":"Student","room":"Grade 7A"},{"name":"พีรวิชญ์ สุโรพันธ์","month":2,"day":26,"role":"Student","room":"Grade 7A"},{"name":"ปทิดา พีรพุทธรางกูร","month":12,"day":7,"role":"Student","room":"Grade 7A"},{"name":"เฌอณิดา ศรีกอก","month":2,"day":7,"role":"Student","room":"Grade 7A"},{"name":"เอลียา ดาเซ่อ","month":12,"day":3,"role":"Student","room":"Grade 7A"},{"name":"มาริโอปารีส อูลริค บลองแดง","month":8,"day":7,"role":"Student","room":"Grade 7A"},{"name":"พราวพัชชา ศรีวงศ์พุฒิกุล","month":6,"day":12,"role":"Student","room":"Grade 7A"},{"name":"ปุณิกา ชื่นโชคนำชัย","month":12,"day":27,"role":"Student","room":"Grade 7A"},{"name":"Mingyue Zhang","month":8,"day":3,"role":"Student","room":"Grade 7A"},{"name":"Hongyi Li","month":7,"day":14,"role":"Student","room":"Grade 7A"},{"name":"Seungmok Shin","month":9,"day":24,"role":"Student","room":"Grade 7A"},{"name":"Wenting Xu","month":6,"day":16,"role":"Student","room":"Grade 7A"},{"name":"พชรภัทร แสงสว่าง","month":2,"day":17,"role":"Student","room":"Grade 7B"},{"name":"ศุภาพิชญ์ วงค์ชมภู","month":10,"day":12,"role":"Student","room":"Grade 7B"},{"name":"พงศพัศ พวงมาลา","month":5,"day":31,"role":"Student","room":"Grade 7B"},{"name":"ปัณณทัต ศรีจันทร์ต๊ะ","month":4,"day":4,"role":"Student","room":"Grade 7B"},{"name":"ณัฏฐิกา ชาญชัยสิริโรจน์","month":12,"day":4,"role":"Student","room":"Grade 7B"},{"name":"จักรวาล ยาสมุทร","month":1,"day":20,"role":"Student","room":"Grade 7B"},{"name":"ธรายุทธ อรรถพรรณ","month":2,"day":1,"role":"Student","room":"Grade 7B"},{"name":"อิงครัต ทะวงศ์","month":3,"day":3,"role":"Student","room":"Grade 7B"},{"name":"รณพีร์ วรโชติคีรี","month":2,"day":6,"role":"Student","room":"Grade 7B"},{"name":"Yunxin Liu","month":1,"day":2,"role":"Student","room":"Grade 7B"},{"name":"Qianyun Zhao","month":7,"day":13,"role":"Student","room":"Grade 7B"},{"name":"นิโคล อารีญา ชิน","month":4,"day":25,"role":"Student","room":"Grade 7B"},{"name":"นรินทร์โชติ ศุจิธรรม","month":4,"day":29,"role":"Student","room":"Grade 7B"},{"name":"นันท์นภัส ดิสโต","month":5,"day":2,"role":"Student","room":"Grade 7B"},{"name":"YIYAO LIU","month":10,"day":31,"role":"Student","room":"Grade 7B"},{"name":"แวนด้า เปรมานนท์","month":4,"day":3,"role":"Student","room":"Grade 7B"},{"name":"ณัฏฐเศรษฐ ศรีวิชัย","month":11,"day":21,"role":"Student","room":"Grade 7B"},{"name":"Moran Cai","month":2,"day":6,"role":"Student","room":"Grade 7B"},{"name":"Jian Jun Liu","month":2,"day":28,"role":"Student","room":"Grade 7B"},{"name":"เฟย์ อลิซ อ็อคเชอร์","month":4,"day":27,"role":"Student","room":"Grade 7B"},{"name":"ปริยาภัทร เมืองโอด","month":12,"day":3,"role":"Student","room":"Grade 7B"},{"name":"ลีลา นิโคลสัน","month":8,"day":26,"role":"Student","room":"Grade 7B"},{"name":"จัสมิน วีเซอร์","month":12,"day":5,"role":"Student","room":"Grade 7B"},{"name":"หฤทชนัน สุกุมลนันทน์","month":9,"day":23,"role":"Student","room":"Grade 7B"},{"name":"ธนกฤต ชูเกียรติขจร","month":4,"day":21,"role":"Student","room":"Grade 7B"},{"name":"Tianzirui Fang","month":7,"day":11,"role":"Student","room":"Grade 7B"},{"name":"Qianyu Liu","month":1,"day":22,"role":"Student","room":"Grade 7B"},{"name":"Yutong Lin","month":11,"day":8,"role":"Student","room":"Grade 7B"},{"name":"Jingshuo Yao","month":8,"day":31,"role":"Student","room":"Grade 7B"},{"name":"อนาสตาเซีย ทีล","month":8,"day":27,"role":"Student","room":"Grade 7B"},{"name":"วิศวภัทร์ ปวงคำ","month":12,"day":4,"role":"Student","room":"Grade 7C"},{"name":"ภุชเคณฑร์ รุ่งพิบูลโสภิษฐ์","month":7,"day":11,"role":"Student","room":"Grade 7C"},{"name":"ญภา เอียดทุ่งคา","month":8,"day":2,"role":"Student","room":"Grade 7C"},{"name":"ปรินทร์ อินวงค์","month":4,"day":10,"role":"Student","room":"Grade 7C"},{"name":"บุรินทร์ นันต๊ะนา","month":2,"day":5,"role":"Student","room":"Grade 7C"},{"name":"โฮรี เซี่ยน","month":11,"day":9,"role":"Student","room":"Grade 7C"},{"name":"ธัญชนก เมืองมูล","month":12,"day":5,"role":"Student","room":"Grade 7C"},{"name":"พรหมพัฒน์ เผ่าพัฒน์","month":10,"day":1,"role":"Student","room":"Grade 7C"},{"name":"วริทธิ์ธร นิติทวีเลิศ","month":12,"day":15,"role":"Student","room":"Grade 7C"},{"name":"จันทรา จันทรวงศ์","month":4,"day":29,"role":"Student","room":"Grade 7C"},{"name":"ANGELA LUOXUAN REN","month":7,"day":3,"role":"Student","room":"Grade 7C"},{"name":"Mutong Li","month":12,"day":14,"role":"Student","room":"Grade 7C"},{"name":"ซอมพอ ตาอินทร์","month":9,"day":30,"role":"Student","room":"Grade 7C"},{"name":"Jiahong Wang","month":4,"day":24,"role":"Student","room":"Grade 7C"},{"name":"JINGZHENG SHI","month":4,"day":21,"role":"Student","room":"Grade 7C"},{"name":"ปุญญะ พงศานรากุล","month":12,"day":17,"role":"Student","room":"Grade 7C"},{"name":"Yibo Fu","month":2,"day":25,"role":"Student","room":"Grade 7C"},{"name":"ปิณภกา สุพารัต","month":2,"day":13,"role":"Student","room":"Grade 7C"},{"name":"ธินทร เถาตระกูล","month":9,"day":25,"role":"Student","room":"Grade 7C"},{"name":"วิภู ภูเงิน","month":6,"day":18,"role":"Student","room":"Grade 7C"},{"name":"สุพิชญาย์ ชนะ","month":8,"day":29,"role":"Student","room":"Grade 7C"},{"name":"ล้านนา นิโคลสัน","month":8,"day":26,"role":"Student","room":"Grade 7C"},{"name":"ปภาวี กันทะติ๊บ","month":12,"day":10,"role":"Student","room":"Grade 7C"},{"name":"Shengxuan Zhao","month":11,"day":8,"role":"Student","room":"Grade 7C"},{"name":"Jiayi Lin","month":8,"day":15,"role":"Student","room":"Grade 7C"},{"name":"เพชรพราว อรภักดี","month":1,"day":14,"role":"Student","room":"Grade 7C"},{"name":"วัฒนะ แซ่หวู่","month":9,"day":12,"role":"Student","room":"Grade 7C"},{"name":"Yiming Tang","month":7,"day":10,"role":"Student","room":"Grade 7C"},{"name":"Zixun Zhou","month":6,"day":13,"role":"Student","room":"Grade 7C"},{"name":"ฌภัสชดา รัชชุศานติ","month":11,"day":1,"role":"Student","room":"Grade 7C"},{"name":"ภภพหยก เกิดสว่างกุล","month":3,"day":17,"role":"Student","room":"Grade 7D"},{"name":"ตี้เหวิน ซึ","month":3,"day":24,"role":"Student","room":"Grade 7D"},{"name":"ณเศรษฐ์ ประคุณนุสิทธิ์","month":4,"day":17,"role":"Student","room":"Grade 7D"},{"name":"ประยุทธ์ ซวี่","month":6,"day":5,"role":"Student","room":"Grade 7D"},{"name":"ปภาดา สุวรรณชิต","month":3,"day":4,"role":"Student","room":"Grade 7D"},{"name":"พิชญ์ เรืองศิลป์สุวิทย์","month":3,"day":4,"role":"Student","room":"Grade 7D"},{"name":"เคอฉิ่ง หู","month":10,"day":14,"role":"Student","room":"Grade 7D"},{"name":"วชิรวิทย์ สุขอารมณ์","month":5,"day":30,"role":"Student","room":"Grade 7D"},{"name":"พัฒนกันต์ กุลศรีสุวรรณ","month":9,"day":18,"role":"Student","room":"Grade 7D"},{"name":"ชิษณุชา อ่อนอุระ","month":12,"day":26,"role":"Student","room":"Grade 7D"},{"name":"ปณิดา ผกาผาด","month":12,"day":27,"role":"Student","room":"Grade 7D"},{"name":"เวสติน เเคม","month":9,"day":20,"role":"Student","room":"Grade 7D"},{"name":"Sunny Zhi Shuo Zhang","month":6,"day":2,"role":"Student","room":"Grade 7D"},{"name":"YaMeng LI","month":1,"day":2,"role":"Student","room":"Grade 7D"},{"name":"ชัยอนันต์ สุชาภัททอนันต์","month":11,"day":17,"role":"Student","room":"Grade 7D"},{"name":"ณชนก สมเครื่อง","month":9,"day":23,"role":"Student","room":"Grade 7D"},{"name":"ศิระกร ตั้งล้ำเลิศ","month":9,"day":26,"role":"Student","room":"Grade 7D"},{"name":"Yiming Fu","month":2,"day":25,"role":"Student","room":"Grade 7D"},{"name":"Bolin Xue","month":1,"day":30,"role":"Student","room":"Grade 7D"},{"name":"Jin Lu","month":2,"day":11,"role":"Student","room":"Grade 7D"},{"name":"วีรพชร สโมทานทวี","month":7,"day":24,"role":"Student","room":"Grade 7D"},{"name":"chuyi gao","month":1,"day":2,"role":"Student","room":"Grade 7D"},{"name":"ฑีระณภ พร้อมมูล","month":6,"day":13,"role":"Student","room":"Grade 7D"},{"name":"ณาฐรฎา พงษ์ปรีชา","month":7,"day":10,"role":"Student","room":"Grade 7D"},{"name":"วรัญชลี จงอยู่สุข","month":6,"day":15,"role":"Student","room":"Grade 7D"},{"name":"Zixin Tang","month":5,"day":6,"role":"Student","room":"Grade 7D"},{"name":"You Wu","month":7,"day":20,"role":"Student","room":"Grade 7D"},{"name":"Yuxin Li","month":5,"day":24,"role":"Student","room":"Grade 7D"},{"name":"พิมพ์วฐา มินเสน","month":10,"day":1,"role":"Student","room":"Grade 7D"},{"name":"กรณ์การุณณ์ เชาวน์ภัณฑ์กุล","month":3,"day":28,"role":"Student","room":"Grade 8A"},{"name":"กัมปนาท พรดรัณภพ","month":10,"day":1,"role":"Student","room":"Grade 8A"},{"name":"บวรทัต สุวรรณ์","month":5,"day":27,"role":"Student","room":"Grade 8A"},{"name":"ปิยวัฒณ์ ทองทวีทัตพงศ์","month":3,"day":7,"role":"Student","room":"Grade 8A"},{"name":"สรสิช ฉัตรตระกูลชัย","month":10,"day":13,"role":"Student","room":"Grade 8A"},{"name":"กันตินันท์ เชี่ยวชาญ","month":11,"day":30,"role":"Student","room":"Grade 8A"},{"name":"ปวริศา น้ำนวล","month":4,"day":9,"role":"Student","room":"Grade 8A"},{"name":"พิชญ์ณภัทร นาทธราดล","month":4,"day":30,"role":"Student","room":"Grade 8A"},{"name":"กัญญาวีร์ ถิรกิจไพบูลย์","month":3,"day":2,"role":"Student","room":"Grade 8A"},{"name":"วชิรวิทย์ พรมกัลป์","month":3,"day":30,"role":"Student","room":"Grade 8A"},{"name":"พิมพ์ณดา ใจยาทา","month":10,"day":26,"role":"Student","room":"Grade 8A"},{"name":"ซี-หยวี ฟง","month":3,"day":18,"role":"Student","room":"Grade 8A"},{"name":"ธริน เถาตระกูล","month":7,"day":8,"role":"Student","room":"Grade 8A"},{"name":"จือ-หยวี จาง","month":10,"day":13,"role":"Student","room":"Grade 8A"},{"name":"อิวาตะ สึมุกิ","month":1,"day":24,"role":"Student","room":"Grade 8A"},{"name":"เจิ้นซินหลิน ตู้","month":4,"day":14,"role":"Student","room":"Grade 8A"},{"name":"อิศราภัทร์ จตุรพิรีย์","month":3,"day":19,"role":"Student","room":"Grade 8A"},{"name":"จิงชิง ซึ","month":7,"day":19,"role":"Student","room":"Grade 8A"},{"name":"นันท์ธีรา วิสุทธิแพทย์","month":2,"day":17,"role":"Student","room":"Grade 8A"},{"name":"ศิรภัสสร เจริญกุศล","month":3,"day":29,"role":"Student","room":"Grade 8A"},{"name":"เจ๋อชิง ซู่","month":5,"day":12,"role":"Student","room":"Grade 8A"},{"name":"พชร แซ่หยาง","month":4,"day":1,"role":"Student","room":"Grade 8A"},{"name":"มณีญาภา สุขจิตภิญโญ","month":8,"day":7,"role":"Student","room":"Grade 8A"},{"name":"หมิงหยาง อู๋","month":8,"day":13,"role":"Student","room":"Grade 8A"},{"name":"สวรส เทพวิญญากิจ","month":9,"day":17,"role":"Student","room":"Grade 8A"},{"name":"ปิยพัทธ์ แซ่หม่า","month":7,"day":12,"role":"Student","room":"Grade 8A"},{"name":"ชิวหยาง ถัง","month":8,"day":22,"role":"Student","room":"Grade 8A"},{"name":"ฮ่อย ลี อลิเซีย ชู","month":6,"day":14,"role":"Student","room":"Grade 8A"},{"name":"Zijun Zhao","month":8,"day":18,"role":"Student","room":"Grade 8A"},{"name":"เตชินท์ วรกิติสรณ์","month":4,"day":15,"role":"Student","room":"Grade 8B"},{"name":"พฤกษ์สรัล อิทธิพัฒนากุล","month":5,"day":1,"role":"Student","room":"Grade 8B"},{"name":"ภากร เชื้อสุข","month":8,"day":29,"role":"Student","room":"Grade 8B"},{"name":"วิทย์วิสิฐ อำนวยชัยชนะ","month":7,"day":4,"role":"Student","room":"Grade 8B"},{"name":"โล่หยู่ หลี่","month":1,"day":18,"role":"Student","room":"Grade 8B"},{"name":"อาจามิน สถิรพงษะสุทธิ","month":8,"day":13,"role":"Student","room":"Grade 8B"},{"name":"ณฤธัช เหล่าพาณิชพิทักษ์","month":10,"day":9,"role":"Student","room":"Grade 8B"},{"name":"เซิงเยว่ หวัง","month":1,"day":27,"role":"Student","room":"Grade 8B"},{"name":"เซียนรุ่ย ซง","month":1,"day":12,"role":"Student","room":"Grade 8B"},{"name":"ชางลี่ หวง","month":10,"day":12,"role":"Student","room":"Grade 8B"},{"name":"กรณ์ปพัฒน์ นันท์สุรีวรา","month":9,"day":12,"role":"Student","room":"Grade 8B"},{"name":"จักกฤศ ชีล์ด","month":10,"day":10,"role":"Student","room":"Grade 8B"},{"name":"กัญญาภา ศรีธิหล้า","month":9,"day":20,"role":"Student","room":"Grade 8B"},{"name":"ณัฏฐกิตติ์ บูรพามงคลชัย","month":8,"day":31,"role":"Student","room":"Grade 8B"},{"name":"นวธร ไกรแก้ว","month":12,"day":10,"role":"Student","room":"Grade 8B"},{"name":"ธรรม์ณภัทร จอมชาญพันธ์","month":8,"day":13,"role":"Student","room":"Grade 8B"},{"name":"YARAN CHEN","month":6,"day":26,"role":"Student","room":"Grade 8B"},{"name":"ปิยพนธ์ แซ่หม่า","month":7,"day":12,"role":"Student","room":"Grade 8B"},{"name":"จือ เว่ย เจ้า","month":2,"day":18,"role":"Student","room":"Grade 8B"},{"name":"ติณณ์ พิทักษ์ภัคนันท์","month":1,"day":9,"role":"Student","room":"Grade 8B"},{"name":"เซิงหลิน เจียง","month":10,"day":21,"role":"Student","room":"Grade 8B"},{"name":"อี้หมิง เหยียน","month":4,"day":29,"role":"Student","room":"Grade 8B"},{"name":"ศศิญา หินยศ","month":7,"day":14,"role":"Student","room":"Grade 8B"},{"name":"ศุภัชญา สุยะใหญ่","month":1,"day":11,"role":"Student","room":"Grade 8B"},{"name":"ปิยะวัฒน์ กุลศรีสุวรรณ","month":1,"day":30,"role":"Student","room":"Grade 8B"},{"name":"กฤษฎิ์มงคล สุธรรมรัตนกุล","month":12,"day":20,"role":"Student","room":"Grade 8B"},{"name":"ปภังกร จันทนสกุลวงศ์","month":9,"day":10,"role":"Student","room":"Grade 8C"},{"name":"ปภังกร ระวิวรรณ","month":9,"day":23,"role":"Student","room":"Grade 8C"},{"name":"ภูมิ์พัฒน์ กรณ์ธนวาทิน","month":10,"day":19,"role":"Student","room":"Grade 8C"},{"name":"โภควินต์ เจนเจริญโภไคย","month":7,"day":12,"role":"Student","room":"Grade 8C"},{"name":"ณิชาภา บุญฤทธิ์นุภาพ","month":9,"day":27,"role":"Student","room":"Grade 8C"},{"name":"พันนภา จิตต์ภักดี","month":6,"day":14,"role":"Student","room":"Grade 8C"},{"name":"AIMEE LI","month":4,"day":16,"role":"Student","room":"Grade 8C"},{"name":"Yanzhao Sun","month":3,"day":10,"role":"Student","room":"Grade 8C"},{"name":"กฤตภัทร สุธรรม","month":7,"day":23,"role":"Student","room":"Grade 8C"},{"name":"QiYang Zhao","month":9,"day":23,"role":"Student","room":"Grade 8C"},{"name":"ก่อฤกษ์ ณ วันจันทร์","month":12,"day":13,"role":"Student","room":"Grade 8C"},{"name":"กรรณิกา ชีล์ด","month":10,"day":10,"role":"Student","room":"Grade 8C"},{"name":"ปุญญธัม ใจอินทร์","month":12,"day":25,"role":"Student","room":"Grade 8C"},{"name":"ชองโฮ ปาร์ค","month":10,"day":16,"role":"Student","room":"Grade 8C"},{"name":"สุดดวงใจ แสนวงศ์","month":10,"day":18,"role":"Student","room":"Grade 8C"},{"name":"เหลียง จื่อ เฟย","month":12,"day":11,"role":"Student","room":"Grade 8C"},{"name":"Krishna Augustus Williams","month":12,"day":18,"role":"Student","room":"Grade 8C"},{"name":"จึ ชุน โฮ","month":12,"day":19,"role":"Student","room":"Grade 8C"},{"name":"ณัฐนกรณ์ บัวรมย์","month":4,"day":22,"role":"Student","room":"Grade 8C"},{"name":"ศตภร จึงแสงสถิตย์พร","month":4,"day":6,"role":"Student","room":"Grade 8C"},{"name":"กุลนิดา มาทีนา อูลริค บลองแดง","month":2,"day":6,"role":"Student","room":"Grade 8C"},{"name":"ภูธารา ตันศิริ","month":4,"day":12,"role":"Student","room":"Grade 8C"},{"name":"วัศชพณธ์ อุดมศรีรัตน์","month":9,"day":3,"role":"Student","room":"Grade 8C"},{"name":"ซื่อ หลิน เจียง","month":12,"day":10,"role":"Student","room":"Grade 8C"},{"name":"กุลนารี มาลูนา อูลริค-บลองแดง","month":2,"day":6,"role":"Student","room":"Grade 8C"},{"name":"ชยพัทธ์ วงศ์เปี่ยมโชค","month":11,"day":19,"role":"Student","room":"Grade 8C"},{"name":"ศิรินธรา ศรีมหัทธชัย","month":4,"day":10,"role":"Student","room":"Grade 8C"},{"name":"ชมภูพิงค์ รินทะกะ","month":6,"day":21,"role":"Student","room":"Grade 8C"},{"name":"ณัฐนันท์ พงศ์วิริทธิ์ธร","month":2,"day":4,"role":"Student","room":"Grade 8C"},{"name":"ปุณณ์ณิษา บุญทา","month":12,"day":6,"role":"Student","room":"Grade 9A"},{"name":"ธนสุกาญจน์ ชัยกิติ","month":11,"day":25,"role":"Student","room":"Grade 9A"},{"name":"มินดา จันทร์ศรี","month":6,"day":14,"role":"Student","room":"Grade 9A"},{"name":"พิสิฐตา ธนวิริยา","month":1,"day":24,"role":"Student","room":"Grade 9A"},{"name":"กัณชานัฏฐ์ อย่างรวย","month":3,"day":30,"role":"Student","room":"Grade 9A"},{"name":"ชลธี ภัทรอุดมกิจ","month":3,"day":31,"role":"Student","room":"Grade 9A"},{"name":"นิธิ สุริยากานนท์","month":8,"day":23,"role":"Student","room":"Grade 9A"},{"name":"อรุณรุ่ง ดวงใจ","month":1,"day":19,"role":"Student","room":"Grade 9A"},{"name":"ธนภัทร คิมหันต์สวัสดิ์","month":8,"day":24,"role":"Student","room":"Grade 9A"},{"name":"ชมพูแพร เทวรักษ์พิทักษ์","month":4,"day":28,"role":"Student","room":"Grade 9A"},{"name":"เซียงถิง เกอ","month":9,"day":25,"role":"Student","room":"Grade 9A"},{"name":"ยี่ซวน ลี่","month":7,"day":28,"role":"Student","room":"Grade 9A"},{"name":"เคเดน สิงโต บาร์นส์","month":12,"day":3,"role":"Student","room":"Grade 9A"},{"name":"พงศภัค จะทอ","month":6,"day":30,"role":"Student","room":"Grade 9A"},{"name":"พชรวัฒน์ แสงสว่าง","month":1,"day":3,"role":"Student","room":"Grade 9A"},{"name":"รติกร จินดามาตย์","month":12,"day":31,"role":"Student","room":"Grade 9A"},{"name":"ณิชาภา อักษรวนิช","month":9,"day":14,"role":"Student","room":"Grade 9A"},{"name":"นิติธร ชัยศรี","month":5,"day":31,"role":"Student","room":"Grade 9A"},{"name":"ปุณฉัตร สมพะวงค์","month":5,"day":11,"role":"Student","room":"Grade 9A"},{"name":"พุยอิ้น ซีโท","month":4,"day":18,"role":"Student","room":"Grade 9A"},{"name":"ภัท วิเศษสิงห์","month":6,"day":8,"role":"Student","room":"Grade 9A"},{"name":"กัลยดา พรสกุลไพศาล","month":3,"day":18,"role":"Student","room":"Grade 9A"},{"name":"พรทิพย์ รัตนวรโชติ","month":4,"day":19,"role":"Student","room":"Grade 9A"},{"name":"เนตั้น อังเดร แมดจัส ฮอตติ","month":7,"day":10,"role":"Student","room":"Grade 9A"},{"name":"กนกรัตน์ รัชชุศิริ","month":10,"day":5,"role":"Student","room":"Grade 9A"},{"name":"ซิเหวิน ซู","month":4,"day":29,"role":"Student","room":"Grade 9A"},{"name":"เจิ้งฉวน จ้าว","month":9,"day":8,"role":"Student","room":"Grade 9A"},{"name":"ทรูแมน แคม","month":9,"day":8,"role":"Student","room":"Grade 9A"},{"name":"ไป่หลิน ลู่","month":7,"day":6,"role":"Student","room":"Grade 9A"},{"name":"ยุนซง เจียง","month":6,"day":3,"role":"Student","room":"Grade 9A"},{"name":"นะโม แย้มวาทีทอง","month":1,"day":6,"role":"Student","room":"Grade 9A"},{"name":"กรณ์ วิฆเนศ","month":2,"day":26,"role":"Student","room":"Grade 9B"},{"name":"กิตติ์ศิริ ปัญญาวัน","month":1,"day":21,"role":"Student","room":"Grade 9B"},{"name":"สุวิจักขณ์ ราชกิจ","month":9,"day":29,"role":"Student","room":"Grade 9B"},{"name":"คริษฐา ปวนแก้วหาญ","month":9,"day":21,"role":"Student","room":"Grade 9B"},{"name":"กฤชจิรัฎฐ์ เพิ่มสันติธรรม","month":9,"day":15,"role":"Student","room":"Grade 9B"},{"name":"เกิดทรัพย์ เกิดสว่างกุล","month":9,"day":14,"role":"Student","room":"Grade 9B"},{"name":"เบน ยูกิ ซูซูกิ","month":1,"day":16,"role":"Student","room":"Grade 9B"},{"name":"สมัชญ์ โตวิจิตร","month":9,"day":9,"role":"Student","room":"Grade 9B"},{"name":"เจียหยิน หลิว","month":6,"day":26,"role":"Student","room":"Grade 9B"},{"name":"ซินหยู่ จาง","month":2,"day":3,"role":"Student","room":"Grade 9B"},{"name":"หังเลี่ย หลี่","month":3,"day":29,"role":"Student","room":"Grade 9B"},{"name":"ชณากวิน เทพจันทร์","month":4,"day":23,"role":"Student","room":"Grade 9B"},{"name":"ชยุตม์ หวัง","month":9,"day":11,"role":"Student","room":"Grade 9B"},{"name":"ฐาพล จิตต์ภักดี","month":3,"day":27,"role":"Student","room":"Grade 9B"},{"name":"ธฤต ธรรมพงศ์พันธ์","month":4,"day":24,"role":"Student","room":"Grade 9B"},{"name":"วรภัทร วิชยาภัย","month":1,"day":18,"role":"Student","room":"Grade 9B"},{"name":"โซเฟีย ไมซี บรายเออร์","month":2,"day":3,"role":"Student","room":"Grade 9B"},{"name":"เซิงยี่ ลู่","month":6,"day":18,"role":"Student","room":"Grade 9B"},{"name":"นันท์นภัส จตุรงค์สัมฤทธิ์","month":9,"day":19,"role":"Student","room":"Grade 9B"},{"name":"อัครพัชร์ ศรีมนัส","month":5,"day":17,"role":"Student","room":"Grade 9B"},{"name":"วาวระย้า ผดุงชีพ","month":2,"day":23,"role":"Student","room":"Grade 9B"},{"name":"กัณฑ์อเนก ธนาศิริวัจน์","month":3,"day":9,"role":"Student","room":"Grade 9B"},{"name":"เต้าเจิ้ง หลิน","month":11,"day":21,"role":"Student","room":"Grade 9B"},{"name":"จือฮุย จาง","month":8,"day":16,"role":"Student","room":"Grade 9B"},{"name":"ยี่ฟาน เฉิน","month":1,"day":5,"role":"Student","room":"Grade 9B"},{"name":"ผู่หลง เฉิง","month":8,"day":9,"role":"Student","room":"Grade 9B"},{"name":"ภูมิภู สุกุมลนันทน์","month":2,"day":12,"role":"Student","room":"Grade 9B"},{"name":"รีวา รุ่ย ฝาน หลิน","month":12,"day":23,"role":"Student","room":"Grade 9B"},{"name":"เฉิ่งจื่อ หลิว","month":4,"day":25,"role":"Student","room":"Grade 9B"},{"name":"สีสมพร ดวงลาสี","month":4,"day":9,"role":"Student","room":"Grade 9B"},{"name":"ธมกร จันทร์เที่ยง","month":9,"day":12,"role":"Student","room":"Grade 9B"},{"name":"เอ็มมา ไซลุง เลอ บูสส์","month":5,"day":17,"role":"Student","room":"Grade 10A"},{"name":"อาร์จูน่า เซียง วิลเลียมส์","month":5,"day":27,"role":"Student","room":"Grade 10A"},{"name":"นันท์นภัส วงศ์กิตติเมธ","month":10,"day":15,"role":"Student","room":"Grade 10A"},{"name":"พุฒิพงศ์ คำใจใส่","month":12,"day":17,"role":"Student","room":"Grade 10A"},{"name":"ดารินทร์ อุณจักร","month":3,"day":20,"role":"Student","room":"Grade 10A"},{"name":"เปรมินทร์ อะเซ็ง","month":1,"day":18,"role":"Student","room":"Grade 10A"},{"name":"เยซึล มิน","month":4,"day":13,"role":"Student","room":"Grade 10A"},{"name":"อริยะ แผ่นทอง","month":9,"day":7,"role":"Student","room":"Grade 10A"},{"name":"การุณญ์รัตน์ เชาวน์ภัณฑ์กุล","month":3,"day":13,"role":"Student","room":"Grade 10A"},{"name":"กัญญาภัค สังข์วัย","month":8,"day":20,"role":"Student","room":"Grade 10A"},{"name":"มินซึล ปาร์ค","month":11,"day":18,"role":"Student","room":"Grade 10A"},{"name":"พิมพ์ลภัทร เตชพิพัฒนกุล","month":9,"day":8,"role":"Student","room":"Grade 10A"},{"name":"ฮายุน ปาร์ค","month":9,"day":2,"role":"Student","room":"Grade 10A"},{"name":"ซินเหยียน หู","month":3,"day":26,"role":"Student","room":"Grade 10A"},{"name":"ณัฏฐนพิน ทับทิมทอง","month":8,"day":22,"role":"Student","room":"Grade 10A"},{"name":"พิชิตชัย พะละคอน","month":7,"day":7,"role":"Student","room":"Grade 10A"},{"name":"เจษฐกานต์ เนื้ออ่อน","month":1,"day":1,"role":"Student","room":"Grade 10A"},{"name":"เย่ฝาน หง","month":3,"day":28,"role":"Student","room":"Grade 10A"},{"name":"ตรัยเพชร วีสมหมาย","month":7,"day":2,"role":"Student","room":"Grade 10A"},{"name":"จงเฉิน ห่าว","month":5,"day":29,"role":"Student","room":"Grade 10A"},{"name":"สรวิชญ์ ปานเจริญ","month":7,"day":8,"role":"Student","room":"Grade 10A"},{"name":"ซิงฉง เค่อ","month":1,"day":13,"role":"Student","room":"Grade 10A"},{"name":"หงส์จือ ลู่","month":8,"day":5,"role":"Student","room":"Grade 10A"},{"name":"ฉินเยว่ ลู่","month":5,"day":27,"role":"Student","room":"Grade 10A"},{"name":"จื่อถง จาง","month":9,"day":11,"role":"Student","room":"Grade 10A"},{"name":"เจียหลาน โจว","month":6,"day":23,"role":"Student","room":"Grade 10A"},{"name":"ย้าว เยอ ไช","month":11,"day":22,"role":"Student","room":"Grade 10A"},{"name":"วรฤทธิ์ รัฐฤทธิ์ธำรง","month":12,"day":14,"role":"Student","room":"Grade 10A"},{"name":"จัสมิน มะลิวรรณ มาเยอร์","month":11,"day":1,"role":"Student","room":"Grade 10A"},{"name":"Rexton Joon Young Ngo","month":10,"day":29,"role":"Student","room":"Grade 10A"},{"name":"ก้องภพ เอียดทุ่งคา","month":1,"day":25,"role":"Student","room":"Grade 10B"},{"name":"อชิระ วรวัฒนสกุล","month":10,"day":10,"role":"Student","room":"Grade 10B"},{"name":"ยี่เชี้ยน จ้าว","month":10,"day":21,"role":"Student","room":"Grade 10B"},{"name":"วรากร วชิรโภคสกุล","month":4,"day":28,"role":"Student","room":"Grade 10B"},{"name":"บวรลักษณ์ มีเดชา","month":12,"day":20,"role":"Student","room":"Grade 10B"},{"name":"บวรทัช ทองอาภรณ์","month":3,"day":7,"role":"Student","room":"Grade 10B"},{"name":"หมิงซี จาง","month":12,"day":17,"role":"Student","room":"Grade 10B"},{"name":"รัชชานนท์ สุระศิรานนท์","month":1,"day":13,"role":"Student","room":"Grade 10B"},{"name":"ณัชฌารีย์ เทพวัลย์","month":1,"day":30,"role":"Student","room":"Grade 10B"},{"name":"แจจุน ยุน","month":10,"day":26,"role":"Student","room":"Grade 10B"},{"name":"ปรัตถกร สินหนัง","month":3,"day":28,"role":"Student","room":"Grade 10B"},{"name":"ชยารัก ภูติยานันต์","month":11,"day":25,"role":"Student","room":"Grade 10B"},{"name":"สิริกร กิติกร","month":3,"day":17,"role":"Student","room":"Grade 10B"},{"name":"Shibo Ren","month":1,"day":27,"role":"Student","room":"Grade 10B"},{"name":"พรพระพุทธ รู้ศาสตร์","month":12,"day":5,"role":"Student","room":"Grade 10B"},{"name":"นันท์ณภัสร์ แก้วเสน่ห์ใน","month":10,"day":4,"role":"Student","room":"Grade 10B"},{"name":"Kexixi Zhang","month":10,"day":19,"role":"Student","room":"Grade 10B"},{"name":"Jiayi liu","month":3,"day":4,"role":"Student","room":"Grade 10B"},{"name":"ปวริศ สุใจ","month":5,"day":5,"role":"Student","room":"Grade 10C"},{"name":"มุกวิรุฬห์ รงควานิช","month":10,"day":14,"role":"Student","room":"Grade 10C"},{"name":"ศิรินทร์ประภา สุมาลี","month":4,"day":7,"role":"Student","room":"Grade 10C"},{"name":"นารีรัตน์ เจียง","month":9,"day":7,"role":"Student","room":"Grade 10C"},{"name":"วรรณรรฐ ฮุนใจบุญ","month":5,"day":16,"role":"Student","room":"Grade 10C"},{"name":"มิกะ ฟูชิมิ","month":1,"day":2,"role":"Student","room":"Grade 10C"},{"name":"ซิงหยู่ เค่อ","month":8,"day":13,"role":"Student","room":"Grade 10C"},{"name":"แองคี้ แมนนี่ แค็ช","month":12,"day":10,"role":"Student","room":"Grade 10C"},{"name":"ปณิดา รุ่งเรืองตระการ","month":9,"day":9,"role":"Student","room":"Grade 10C"},{"name":"เจ๋อหัว หวัง","month":10,"day":28,"role":"Student","room":"Grade 10C"},{"name":"พศิน ภักดีคีรีหยก","month":10,"day":5,"role":"Student","room":"Grade 10C"},{"name":"เจินนั่ว จ้าว","month":11,"day":25,"role":"Student","room":"Grade 10C"},{"name":"เทียนเฉิน จาง","month":9,"day":13,"role":"Student","room":"Grade 10C"},{"name":"แพงพัฒน์ ลภัสนิธิโรจน์","month":9,"day":17,"role":"Student","room":"Grade 10C"},{"name":"แท่งทอง กุลศรีสุวรรณ","month":5,"day":13,"role":"Student","room":"Grade 10C"},{"name":"ปี้-จวิ้น จาง","month":2,"day":19,"role":"Student","room":"Grade 10C"},{"name":"ซือฉี เจีย","month":10,"day":29,"role":"Student","room":"Grade 10C"},{"name":"ปวริศา หมื่นมูล","month":4,"day":6,"role":"Student","room":"Grade 10C"},{"name":"ณัฏฐณิชา ธำรงค์ทิพยคุณ","month":2,"day":13,"role":"Student","room":"Grade 10C"},{"name":"แพรวพชรสรณ์ วัฒนาวรางกูล","month":3,"day":4,"role":"Student","room":"Grade 10C"},{"name":"Cheuk Lap Chow","month":2,"day":14,"role":"Student","room":"Grade 10C"},{"name":"ChenXi Luo","month":1,"day":30,"role":"Student","room":"Grade 10C"},{"name":"มิลิน ศรีคงแก้ว","month":5,"day":23,"role":"Student","room":"Grade 10C"},{"name":"ณัฐภรณ์ โชติธนชญาณ์นนท์","month":8,"day":15,"role":"Student","room":"Grade 10C"},{"name":"จารุวิทย์ บุญประกอบ","month":2,"day":6,"role":"Student","room":"Grade 10C"},{"name":"ชนกันต์ ผิวขาว","month":2,"day":18,"role":"Student","room":"Grade 10C"},{"name":"ปรัชญา โกฎคำลือ","month":9,"day":6,"role":"Student","room":"Grade 10C"},{"name":"พีรพงศ์ ตันติพงษ์วณิช","month":9,"day":23,"role":"Grade 10C"},{"name":"ณิชชนินทร์ พัวพรสวรรค์","month":1,"day":30,"role":"Student","room":"Grade 10C"},{"name":"ปภาพินท์ เจตวิเศษไพศาล","month":2,"day":4,"role":"Student","room":"Grade 10C"},{"name":"ธนนท์ หยงสตาร์","month":7,"day":16,"role":"Student","room":"Grade 11A"},{"name":"ธาริดา เกษประดิษฐ","month":8,"day":30,"role":"Student","room":"Grade 11A"},{"name":"ภาคิน โพธิสารัตนะ","month":6,"day":30,"role":"Student","room":"Grade 11A"},{"name":"ณัฐนันท์ สิงห์โตโรจน์","month":12,"day":14,"role":"Student","room":"Grade 11A"},{"name":"พราว เรืองศิลป์สุวิทย์","month":9,"day":29,"role":"Student","room":"Grade 11A"},{"name":"วรทกร เหลืองวานิช","month":3,"day":29,"role":"Student","room":"Grade 11A"},{"name":"ไชยวัฒณ์ อัศวสุคนธ์","month":2,"day":14,"role":"Student","room":"Grade 11A"},{"name":"พรนิชา เชื้อสุข","month":4,"day":9,"role":"Student","room":"Grade 11A"},{"name":"อธิก วงศ์รุ่ง","month":4,"day":14,"role":"Student","room":"Grade 11A"},{"name":"ภควัจน์ อภิสิทธิ์โยธิน","month":11,"day":2,"role":"Student","room":"Grade 11A"},{"name":"พอพระทัย จันทร์แจ่ม","month":8,"day":3,"role":"Student","room":"Grade 11A"},{"name":"ไบรโอนี พุทธรักษา เต๋า","month":8,"day":5,"role":"Student","room":"Grade 11A"},{"name":"แทตย์สึ รัตนประภา","month":5,"day":24,"role":"Student","room":"Grade 11A"},{"name":"ภีมร์ รัตนประภา","month":5,"day":24,"role":"Student","room":"Grade 11A"},{"name":"โรเบิร์จ ชาร์ลส์ เปรม บรัคเนลล์","month":2,"day":25,"role":"Student","room":"Grade 11A"},{"name":"พิมพ์ลภัส ศรีมนัส","month":8,"day":5,"role":"Student","room":"Grade 11A"},{"name":"นัฏฐ์ดาว ประดุจฟ้า","month":2,"day":18,"role":"Student","room":"Grade 11A"},{"name":"หมิงฟู่ หยู","month":2,"day":17,"role":"Student","room":"Grade 11A"},{"name":"หยวนจวิน หม่า","month":8,"day":2,"role":"Student","room":"Grade 11A"},{"name":"คุณัชญ์ เทวรักษ์พิทักษ์","month":10,"day":29,"role":"Student","room":"Grade 11A"},{"name":"จงหลิน เฉิน","month":2,"day":19,"role":"Student","room":"Grade 11A"},{"name":"เหวินเย่ว เฉิง","month":11,"day":19,"role":"Student","room":"Grade 11A"},{"name":"ภัทรภร โชติษฐยางกูร","month":12,"day":28,"role":"Student","room":"Grade 11A"},{"name":"ชนัญชิดา พึ่งประเสริฐพานิช","month":8,"day":21,"role":"Student","room":"Grade 11A"},{"name":"ชนิตา พฤกษ์ชินวร","month":5,"day":28,"role":"Student","room":"Grade 11A"},{"name":"ผกาเดือน มงคลคี","month":8,"day":30,"role":"Student","room":"Grade 11A"},{"name":"สุฐิตา เมฆพัฒน์","month":10,"day":11,"role":"Student","room":"Grade 11A"},{"name":"วรรณสิงห์ สุวิทย์ศักดานนท์","month":12,"day":20,"role":"Student","room":"Grade 11A"},{"name":"อัฐภิญญา หอมกลิ่น","month":5,"day":6,"role":"Student","room":"Grade 11A"},{"name":"นัฐธิดา แซ่ก๊อ","month":8,"day":11,"role":"Student","room":"Grade 11A"},{"name":"พัทธ์ธีรา ศิริรักษ์","month":9,"day":9,"role":"Student","room":"Grade 11B"},{"name":"มินฮา พาร์ค","month":11,"day":3,"role":"Student","room":"Grade 11B"},{"name":"ศิรภัสสร เณราธึก","month":1,"day":14,"role":"Student","room":"Grade 11B"},{"name":"อิทธิพร เจียง","month":6,"day":18,"role":"Student","room":"Grade 11B"},{"name":"ณัฏฐพล ศรีวิชัย","month":12,"day":14,"role":"Student","room":"Grade 11B"},{"name":"วรฤทธฺ์ มีมา","month":10,"day":21,"role":"Student","room":"Grade 11B"},{"name":"พรปวีณ์ แซ่หยิง","month":11,"day":27,"role":"Student","room":"Grade 11B"},{"name":"ภัทรกร ธินันชัย","month":2,"day":17,"role":"Student","room":"Grade 11B"},{"name":"ธนกฤต จินาอิ","month":4,"day":6,"role":"Student","room":"Grade 11B"},{"name":"ธนภรณ์ ไฝปัน","month":11,"day":23,"role":"Student","room":"Grade 11B"},{"name":"ธนโชติ กันภัย","month":8,"day":4,"role":"Student","room":"Grade 11B"},{"name":"พิพาภรณ์ ราชนิภา","month":8,"day":27,"role":"Student","room":"Grade 11B"},{"name":"เซิงเจี่ย จู้","month":11,"day":7,"role":"Student","room":"Grade 11B"},{"name":"ชิน ธิริ ทู","month":11,"day":19,"role":"Student","room":"Grade 11B"},{"name":"สิริโชค วรรณรัตน์","month":5,"day":9,"role":"Student","room":"Grade 11B"},{"name":"ก่อวิรุฬห์ ศิริพรพิริยะ","month":9,"day":19,"role":"Student","room":"Grade 11B"},{"name":"กฤษฎา กองนอก","month":10,"day":25,"role":"Student","room":"Grade 11B"},{"name":"ธัญญนันทน์ เทพวัลย์","month":10,"day":2,"role":"Student","room":"Grade 11B"},{"name":"วรดา เบเชกู่","month":6,"day":17,"role":"Student","room":"Grade 11B"},{"name":"YiXin Zhang","month":8,"day":23,"role":"Student","room":"Grade 11B"},{"name":"วรูณ โซนี่","month":12,"day":1,"role":"Student","room":"Grade 11B"},{"name":"ถิงหราน ลู่","month":5,"day":19,"role":"Student","room":"Grade 11B"},{"name":"หยุนตัว เจียง","month":6,"day":28,"role":"Student","room":"Grade 11B"},{"name":"ปัณชญา อนันต์กุลทวี","month":7,"day":29,"role":"Student","room":"Grade 11B"},{"name":"พัชรา ลดาวัลย์รุ่งเรือง","month":8,"day":18,"role":"Student","room":"Grade 11B"},{"name":"ซีจือ ซวี่","month":4,"day":17,"role":"Student","room":"Grade 11B"},{"name":"หยู่เฉิง ซ่ง","month":7,"day":18,"role":"Student","room":"Grade 11B"},{"name":"จิวร จึงอยู่สุข","month":4,"day":28,"role":"Student","room":"Grade 11B"},{"name":"ชนันชิดา ธาตุรักษ์","month":7,"day":31,"role":"Student","room":"Grade 11B"},{"name":"สาริศา สุทธิอาจ","month":2,"day":24,"role":"Student","room":"Grade 11B"},{"name":"ณัฐดา วรรธนะลือ","month":7,"day":23,"role":"Student","room":"Grade 11B"},{"name":"หงเจีย หม่า","month":3,"day":13,"role":"Student","room":"Grade 11C"},{"name":"หงเหวิน หม่า","month":3,"day":13,"role":"Student","room":"Grade 11C"},{"name":"เหมยเก๋อ สวี้","month":11,"day":17,"role":"Student","room":"Grade 11C"},{"name":"เมี่ยวเอิน พาน Miaoen Pan","month":2,"day":12,"role":"Student","room":"Grade 11C"},{"name":"โหย่วเอิน พาน Youen Pan","month":2,"day":12,"role":"Student","room":"Grade 11C"},{"name":"เอินฉวน เหลียง Enquan Liang","month":1,"day":29,"role":"Student","room":"Grade 11C"},{"name":"หว่านหวาน หยาง","month":1,"day":19,"role":"Student","room":"Grade 11C"},{"name":"เวินจู หลี่","month":9,"day":8,"role":"Student","room":"Grade 11C"},{"name":"โยว ยวี่ สวี่","month":12,"day":24,"role":"Student","room":"Grade 11C"},{"name":"ยาซีน หลี่","month":1,"day":31,"role":"Student","room":"Grade 11C"},{"name":"ภีมนารา เวลาดี","month":10,"day":3,"role":"Student","room":"Grade 12A"},{"name":"สิรินธรรม ภิชญอรกช","month":11,"day":16,"role":"Student","room":"Grade 12A"},{"name":"ณภัทร ชัยชนะ","month":5,"day":4,"role":"Student","room":"Grade 12A"},{"name":"กันตรัตน์ คงอุทัยสกุล","month":9,"day":1,"role":"Student","room":"Grade 12A"},{"name":"ฮานนาห์ ฮนิตา ซูซูกิ","month":6,"day":21,"role":"Student","room":"Grade 12A"},{"name":"กฤติโกมล สุใจ","month":8,"day":27,"role":"Student","room":"Grade 12A"},{"name":"สิทธินันท์ สุทธินันท์ไชย","month":1,"day":7,"role":"Student","room":"Grade 12A"},{"name":"ปณิดา ทิพยาวงษ์","month":7,"day":12,"role":"Student","room":"Grade 12A"},{"name":"สุรนันทน์ มุสิกะนันทน์","month":2,"day":16,"role":"Student","room":"Grade 12A"},{"name":"พีร์ กันทวงศ์","month":7,"day":16,"role":"Student","room":"Grade 12A"},{"name":"ปุณญาณิศ แยบกสิกิจ","month":2,"day":12,"role":"Student","room":"Grade 12A"},{"name":"ณฐพล เป็งโก","month":8,"day":18,"role":"Student","room":"Grade 12A"},{"name":"วรรณกร สุวรรณกาฬ","month":4,"day":30,"role":"Student","room":"Grade 12A"},{"name":"สิกขการ หวัง","month":6,"day":26,"role":"Student","room":"Grade 12A"},{"name":"สรัล สิงหรา","month":4,"day":16,"role":"Student","room":"Grade 12A"},{"name":"โสภณวิชญ์ รักรังสี","month":2,"day":19,"role":"Student","room":"Grade 12A"},{"name":"จื่อเฉิง หยาง","month":1,"day":5,"role":"Student","room":"Grade 12A"},{"name":"จงซิน ซือ","month":4,"day":2,"role":"Student","room":"Grade 12A"},{"name":"ณัฐนัย โกไศยกานนท์","month":5,"day":25,"role":"Student","room":"Grade 12A"},{"name":"วรณิชชา เติมศรี","month":2,"day":24,"role":"Student","room":"Grade 12A"},{"name":"ลียา ซู","month":10,"day":27,"role":"Student","room":"Grade 12A"},{"name":"ฉงอี้ หลู่","month":11,"day":18,"role":"Student","room":"Grade 12A"},{"name":"มานลิน อู๋","month":4,"day":23,"role":"Student","room":"Grade 12A"},{"name":"วิรดา จิตตจรัส","month":2,"day":4,"role":"Student","room":"Grade 12A"},{"name":"พัฒน์นรี ธนาศิริวัจน์","month":5,"day":5,"role":"Student","room":"Grade 12A"},{"name":"ธัญญลักษณ์ วัฒนประพันธ์","month":7,"day":7,"role":"Student","room":"Grade 12A"},{"name":"กันตวัฒน์ คงอุทัยสกุล","month":9,"day":1,"role":"Student","room":"Grade 12A"},{"name":"ห่าวเอี้ยน เฉิน","month":1,"day":19,"role":"Student","room":"Grade 12A"},{"name":"วิคเตอร์ นุติ แฟรงค์กลิน","month":4,"day":30,"role":"Student","room":"Grade 12B"},{"name":"เจแดน นุตา แฟรงค์กลิน","month":4,"day":30,"role":"Student","room":"Grade 12B"},{"name":"ลินเซ่ ลานนา ฟ้า ดูแอส์น","month":6,"day":22,"role":"Student","room":"Grade 12B"},{"name":"ณัฐกฤต ทักษิณกำเนิด","month":4,"day":1,"role":"Student","room":"Grade 12B"},{"name":"นนน มานิตย์","month":9,"day":14,"role":"Student","room":"Grade 12B"},{"name":"ชัญญ์ลียา กรณ์ธนวาทิน","month":6,"day":27,"role":"Student","room":"Grade 12B"},{"name":"ธัญจิรา สิริบุณยเวช","month":3,"day":28,"role":"Student","room":"Grade 12B"},{"name":"จิรพนธ์ เซี่ยง","month":3,"day":22,"role":"Student","room":"Grade 12B"},{"name":"จิรพัส เซี่ยง","month":3,"day":22,"role":"Student","room":"Grade 12B"},{"name":"อิสรีย์ สมเป้า","month":5,"day":2,"role":"Student","room":"Grade 12B"},{"name":"ณัชชาวีณ์ ทองหนา","month":3,"day":30,"role":"Student","room":"Grade 12B"},{"name":"พัณณภรณ์ นิธิศรากุลพงศ์","month":8,"day":6,"role":"Student","room":"Grade 12B"},{"name":"อภิรุจน์ ธรรมรัตน์","month":9,"day":6,"role":"Student","room":"Grade 12B"},{"name":"ปาร์คนิน ชู","month":11,"day":20,"role":"Student","room":"Grade 12B"},{"name":"ซีเหวย จ้าว","month":8,"day":24,"role":"Student","room":"Grade 12B"},{"name":"ห่าวฮวา เฉิน","month":5,"day":21,"role":"Student","room":"Grade 12B"},{"name":"ภัสสกร ยี่ภิญโญ","month":11,"day":19,"role":"Student","room":"Grade 12B"},{"name":"พลอยศิรัส จตุธนาภิรมย์","month":11,"day":12,"role":"Student","room":"Grade 12B"},{"name":"แองเจิล บีบี แค็ช","month":11,"day":22,"role":"Student","room":"Grade 12B"},{"name":"โบเวน ฮู","month":9,"day":28,"role":"Student","room":"Grade 12B"},{"name":"ซีฮั่น เจิง","month":11,"day":17,"role":"Student","room":"Grade 12B"},{"name":"เอนซุน ชิ","month":12,"day":15,"role":"Student","room":"Grade 12B"},{"name":"พรลภัส จะทอ","month":8,"day":27,"role":"Student","room":"Grade 12B"},{"name":"สุรพล เชอหมื่อ","month":6,"day":1,"role":"Student","room":"Grade 12B"},{"name":"ฮั่นผู หวัง","month":8,"day":21,"role":"Student","room":"Grade 12B"},{"name":"ชาริสา ธาริซ่า สมศักดิ์","month":8,"day":23,"role":"Student","room":"Grade 12B"},{"name":"รชต อดุลตระกูล","month":2,"day":8,"role":"Student","room":"Grade 12B"},{"name":"พีมม์ สมบูรณ์วรกิจ","month":5,"day":22,"role":"Student","room":"Grade 12B"}];
+
+const MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+// ── Audio Context & Sound Synthesizer ──
+let audioCtx = null;
+let isMuted = false;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  document.getElementById('muteBtn').textContent = isMuted ? '🔇 เสียง: ปิด' : '🔊 เสียง: เปิด';
+}
+
+// 1. เสียงติ๊กเบา ๆ ตอนเริ่มสุ่มชื่อ (Spin Tick)
+function playTickSound() {
+  if (isMuted) return;
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(550, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
+  
+  gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.04);
+}
+
+// 2. เสียงตีกลองลุ้นระทึก (Drum Roll)
+let drumInterval = null;
+function startDrumRoll() {
+  if (isMuted) return;
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  drumInterval = setInterval(() => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(75 + Math.random() * 25, audioCtx.currentTime);
+    
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.07);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.07);
+  }, 45);
+}
+
+function stopDrumRoll() {
+  if (drumInterval) {
+    clearInterval(drumInterval);
+    drumInterval = null;
+  }
+}
+
+// 3. เสียงแตรฉลองอย่างยิ่งใหญ่ (Success Fanfare Chord)
+function playFanfare() {
+  if (isMuted) return;
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  const now = audioCtx.currentTime;
+  // ไล่สเกลเมเจอร์คอร์ด (C-E-G-C) สร้างความรู้สึกน่ายินดี
+  const chordNotes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+  
+  chordNotes.forEach((freq, idx) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+    
+    gain.gain.setValueAtTime(0, now + idx * 0.07);
+    gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.07 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.5);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start(now + idx * 0.07);
+    osc.stop(now + idx * 0.07 + 0.55);
+  });
+}
+
+
+// ── State Management ──
+const getBangkokDate = () => {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric'
+  });
+  const parts = formatter.formatToParts(now);
+  const dateParts = {};
+  parts.forEach(p => { dateParts[p.type] = p.value; });
+  
+  return {
+    day: parseInt(dateParts.day, 10),
+    month: parseInt(dateParts.month, 10),
+    year: parseInt(dateParts.year, 10)
+  };
+};
+
+const isLeapYear = (year) => {
+  return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+};
+
+// เริ่มต้นดึงวันปัจจุบัน
+const bkkInfo = getBangkokDate();
+let TODAY_M = bkkInfo.month;
+let TODAY_D = bkkInfo.day;
+let TODAY_Y = bkkInfo.year;
+
+const getTodayBirthdays = () => {
+  return ALL_DATA.filter(p => {
+    if (p.month === TODAY_M && p.day === TODAY_D) {
+      return true;
+    }
+    // หากปีนี้ไม่ใช่ปีอธิกสุรทิน และวันนี้เป็นวันที่ 28 ก.พ. ให้รวมคนเกิดวันที่ 29 ก.พ. เข้ามาด้วย
+    if (!isLeapYear(TODAY_Y) && TODAY_M === 2 && TODAY_D === 28) {
+      return p.month === 2 && p.day === 29;
+    }
+    return false;
+  }).sort(() => Math.random() - 0.5); // Shuffle
+};
+
+let todayPeople = getTodayBirthdays();
+let revealedCount = 0;
+let isAnimating = false;
+let done = false;
+
+// ── Init ──
+(function init() {
+  const dateInput = document.getElementById('dateInput');
+  // ตั้งค่าเริ่มต้นใน input date (YYYY-MM-DD)
+  const yStr = TODAY_Y;
+  const mStr = String(TODAY_M).padStart(2, '0');
+  const dStr = String(TODAY_D).padStart(2, '0');
+  dateInput.value = `${yStr}-${mStr}-${dStr}`;
+
+  checkAndRenderState();
+})();
+
+// ตรวจเช็คเพื่อเตรียมหน้าจอเริ่มต้น
+function checkAndRenderState() {
+  if (todayPeople.length === 0) {
+    showEmptyState();
+  } else {
+    showInitialState();
+  }
+}
+
+function showEmptyState() {
+  document.getElementById('spinBtn').style.display = 'none';
+  document.getElementById('mystLabel').textContent = 'วันนี้เป็นวันสบาย ๆ';
+  const card = document.getElementById('bigCard');
+  card.className = 'big-card no-more';
+  
+  document.getElementById('cardInner').innerHTML = `
+    <div class="reveal-emoji">🍃</div>
+    <div class="no-more-text">วันนี้ไม่มีวันเกิดในระบบ</div>
+    <div class="no-more-sub">ขอให้วันนี้เป็นวันที่ดีและมีความสุขสำหรับทุกคนนะจ้า 🎉</div>
+  `;
+}
+
+function showInitialState() {
+  document.getElementById('spinBtn').style.display = '';
+  document.getElementById('spinBtn').disabled = false;
+  document.getElementById('bigCard').className = 'big-card idle';
+  document.getElementById('cardInner').innerHTML = `
+    <div class="qmark">🎁</div>
+    <div class="qmark-sub">กดปุ่มด้านล่างเพื่อลุ้น</div>
+  `;
+  document.getElementById('mystLabel').textContent = 'กดเพื่อเปิดเผยคนแรก';
+  updateBtn();
+}
+
+// ── ดักจับเหตุการณ์เมื่อเปลี่ยนปฏิทิน ──
+function onDateChange(event) {
+  const val = event.target.value;
+  if (!val) return;
+  
+  const [yr, mo, dy] = val.split('-').map(Number);
+  TODAY_Y = yr;
+  TODAY_M = mo;
+  TODAY_D = dy;
+
+  todayPeople = getTodayBirthdays();
+  resetAll();
+}
+
+function updateBtn() {
+  const btn = document.getElementById('spinBtn');
+  if (done || todayPeople.length === 0) return;
+  if (revealedCount === 0) {
+    btn.textContent = '🎁 เปิดเผยคนแรก!';
+  } else {
+    const remaining = todayPeople.length - revealedCount;
+    btn.textContent = remaining > 0
+      ? `🎰 เปิดคนต่อไป (เหลือ ${remaining} คน)`
+      : '🎊 ดูสรุป!';
+  }
+}
+
+async function reveal() {
+  if (isAnimating || done || todayPeople.length === 0) return;
+
+  if (revealedCount >= todayPeople.length) {
+    showSummary();
+    return;
+  }
+
+  isAnimating = true;
+  document.getElementById('spinBtn').disabled = true;
+
+  const person = todayPeople[revealedCount];
+  const card = document.getElementById('bigCard');
+  const inner = document.getElementById('cardInner');
+
+  // ── Phase 1: Spinning (สุ่มแสดงชื่อที่รันความเร็วสูงพร้อมเสียง Blip) ──
+  card.className = 'big-card spinning';
+  document.getElementById('mystLabel').textContent = 'กำลังค้นหา...';
+
+  const progWrap = document.getElementById('progWrap');
+  const progFill = document.getElementById('progFill');
+  const progLabel = document.getElementById('progLabel');
+  progWrap.classList.add('show');
+
+  const otherPeople = ALL_DATA.filter(p => !todayPeople.some(tp => tp.name === p.name));
+  const dummyPool = otherPeople.length > 0 ? otherPeople : ALL_DATA;
+
+  const interval = setInterval(() => {
+    const rnd = dummyPool[Math.floor(Math.random() * dummyPool.length)];
+    inner.innerHTML = `<div class="spin-text">${rnd.name}</div>`;
+    playTickSound(); // เล่นเสียงประกอบทุกครั้งที่เปลี่ยนแผ่นป้ายชื่อสุ่ม
+  }, 70);
+
+  await sleep(1800);
+  clearInterval(interval);
+
+  // ── Phase 2: เริ่มเสียงกลองรัวระทึก (Drum Roll) ระหว่างเครื่องหมายสัญลักษณ์ ──
+  inner.innerHTML = `<div class="spin-text" style="font-size:2rem">🥁🥁🥁</div>`;
+  startDrumRoll();
+  await sleep(800);
+  stopDrumRoll();
+
+  // ── Phase 3: เปิดเผยข้อมูลจริงและเล่นเสียงแตรฉลอง ──
+  card.className = 'big-card revealed';
+  const emoji = person.role === 'Teacher' ? '👩‍🏫' : '🎒';
+  inner.innerHTML = `
+    <div class="reveal-emoji">🎂</div>
+    <div class="reveal-name">${person.name}</div>
+    <div class="reveal-meta">
+      <span class="badge ${person.role === 'Teacher' ? 'teacher' : 'student'}">${emoji} ${person.role === 'Teacher' ? 'ครู' : 'นักเรียน'}</span>
+      <span class="badge room">${person.room}</span>
+    </div>
+  `;
+
+  playFanfare(); // เล่นเสียงคอร์ดดนตรีสังเคราะห์
+  launchConfetti(25);
+
+  revealedCount++;
+  const pct = (revealedCount / todayPeople.length) * 100;
+  progFill.style.width = pct + '%';
+  progLabel.textContent = `เปิดแล้ว ${revealedCount} / ${todayPeople.length} คน`;
+  document.getElementById('mystLabel').textContent = `🎂 วันเกิดวันนี้ คนที่ ${revealedCount}!`;
+
+  addToRevealedList(person, revealedCount);
+  updateBtn();
+
+  if (revealedCount >= todayPeople.length) {
+    done = true;
+    await sleep(800);
+    document.getElementById('spinBtn').textContent = '🎊 ดูสรุปทั้งหมด!';
+    document.getElementById('spinBtn').disabled = false;
+    document.getElementById('resetBtn').classList.add('show');
+    isAnimating = false;
+    return;
+  }
+
+  await sleep(300);
+  isAnimating = false;
+  document.getElementById('spinBtn').disabled = false;
+}
+
+function addToRevealedList(person, num) {
+  const section = document.getElementById('revealedSection');
+  const list = document.getElementById('revealedList');
+  const title = document.getElementById('revealedTitle');
+
+  section.style.display = 'block';
+  title.textContent = `เปิดเผยแล้ว ${num} คน`;
+
+  const emoji = person.role === 'Teacher' ? '👩‍🏫' : '🎒';
+  const item = document.createElement('div');
+  item.className = 'revealed-item';
+  item.innerHTML = `
+    <div class="item-num">${num}</div>
+    <div class="item-info">
+      <div class="item-name">${person.name}</div>
+      <div class="item-meta">
+        <span class="badge ${person.role === 'Teacher' ? 'teacher' : 'student'}">${emoji} ${person.role === 'Teacher' ? 'ครู' : 'นักเรียน'}</span>
+        <span class="badge room">${person.room}</span>
+      </div>
+    </div>
+    <div style="font-size:1.5rem">🎂</div>
+  `;
+  list.appendChild(item);
+
+  setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+function showSummary() {
+  const box = document.getElementById('summaryBox');
+  const num = document.getElementById('summaryNum');
+  const note = document.getElementById('summaryNote');
+
+  const teachers = todayPeople.filter(p => p.role === 'Teacher');
+  const students = todayPeople.filter(p => p.role === 'Student');
+
+  num.textContent = todayPeople.length;
+  let notes = [];
+  if (teachers.length) notes.push(`👩‍🏫 ครู ${teachers.length} คน`);
+  if (students.length) notes.push(`🎒 นักเรียน ${students.length} คน`);
+  note.textContent = notes.join('  ·  ') + '\nขอให้มีความสุขในวันเกิดทุกคนนะจ้า 🎉';
+
+  box.classList.add('show');
+  playFanfare();
+  launchConfetti(65);
+
+  document.getElementById('spinBtn').style.display = 'none';
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetAll() {
+  stopDrumRoll();
+  revealedCount = 0; 
+  isAnimating = false; 
+  done = false;
+
+  document.getElementById('progWrap').classList.remove('show');
+  document.getElementById('progFill').style.width = '0%';
+  document.getElementById('progLabel').textContent = '';
+  document.getElementById('revealedSection').style.display = 'none';
+  document.getElementById('revealedList').innerHTML = '';
+  document.getElementById('revealedTitle').textContent = 'เปิดเผยแล้ว';
+  document.getElementById('summaryBox').classList.remove('show');
+  document.getElementById('resetBtn').classList.remove('show');
+
+  checkAndRenderState();
+}
+
+// ── Helpers ──
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function launchConfetti(n) {
+  const wrap = document.getElementById('confettiWrap');
+  const colors = ['#FFD700','#FF6B9D','#00E5FF','#7B2FBE','#FF9500','#00FF88','#fff'];
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'cp';
+    const sz = Math.random() * 10 + 5;
+    const shapes = ['50%','0%'];
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      width:${sz}px; height:${sz}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${shapes[Math.floor(Math.random()*2)]};
+      animation-duration:${2+Math.random()*2.5}s;
+      animation-delay:${Math.random()*0.6}s;
+    `;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  }
+}
+</script>
+</body>
+</html>
